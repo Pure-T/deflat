@@ -102,7 +102,7 @@ if __name__ == '__main__':
     for node in supergraph.nodes():
         if supergraph.in_degree(node) == 0:
             prologue_node = node
-        if supergraph.out_degree(node) == 0:
+        if supergraph.out_degree(node) == 0 and len(node.out_branches) == 0 :
             retn_node = node
     
     if prologue_node is None or prologue_node.addr != start:
@@ -146,8 +146,12 @@ if __name__ == '__main__':
             elif ins.insn.mnemonic.startswith('call'):
                 hook_addr = ins.insn.address
         if has_branches:
-            flow[relevant].append(symbolic_execution(relevant.addr, hook_addr, claripy.BVV(1, 1), True))
-            flow[relevant].append(symbolic_execution(relevant.addr, hook_addr, claripy.BVV(0, 1), True))
+            temp = symbolic_execution(relevant.addr, hook_addr, claripy.BVV(1, 1), True)
+            if temp != None :
+                flow[relevant].append(temp)
+            temp = symbolic_execution(relevant.addr, hook_addr, claripy.BVV(0, 1), True)
+            if temp != None :
+                flow[relevant].append(temp)
         else:
             flow[relevant].append(symbolic_execution(relevant.addr, hook_addr))
             
